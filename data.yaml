@@ -1,0 +1,5 @@
+train: ../train/images
+val: ../valid/images
+
+nc: 27
+names: ['apple', 'banana', 'beef', 'bread', 'butter', 'carrot', 'cheese', 'chicken', 'chicken_breast', 'chocolate', 'corn', 'egg', 'flour', 'goat_cheese', 'green_beans', 'ground_beef', 'ham', 'heavy_cream', 'milk', 'mushroom', 'potato', 'shrimp', 'spinach', 'strawberries', 'sugar', 'sweet_potato', 'tomato']
