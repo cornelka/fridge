@@ -117,14 +117,21 @@ def detect_aicook(opt):
                         plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=opt.line_thickness)
                         if opt.save_crop:
                             save_one_box(xyxy, im0s, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
-
-                if int(opt.top_conf) > 0:
-                    txt_path2 = txt_path.replace('labels','top_conf')
-                    labl_conf = det[det[:,4].argsort()][::-1][:,4:6]  #sorted descending by confidence
+                
+                opt_top_conf = int(opt.top_conf) 
+                if opt_top_conf > 0:
+                    det_cpu = det.to('cpu').numpy()
+                    top_conf_cnt = 1
+                    labl_conf = det_cpu[det_cpu[:,4].argsort()][::-1][:,4:6]  #sorted descending by confidence and only keep confidence + label
                     for cf in labl_conf[::] :
-                        line2= (names[int(cf[1])], str(cf[0]))                        
-                        with open(txt_path2 + '.txt', 'a') as f:
-                            f.write(line2 + '\n')
+                        if top_conf_cnt <= opt_top_conf:
+                            top_conf_cnt += 1
+                            with open(txt_path + '_top_conf.txt', 'a') as f:
+                                f.write(names[int(cf[1])] + ";" + str(cf[0]) + '\n')
+            else:
+                with open(txt_path + '_top_conf.txt', 'a') as f:
+                    f.write('No ingredients found, this fridge is empty. I predict Dominos! \n')
+
 
             # Print time (inference + NMS)
             print(f'{s}Done. ({t2 - t1:.3f}s)')
