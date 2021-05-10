@@ -45,6 +45,8 @@ def detect_aicook(opt):
         modelc = load_classifier(name='resnet101', n=2)  # initialize
         modelc.load_state_dict(torch.load('weights/resnet101.pt', map_location=device)['model']).to(device).eval()
 
+    print(f'Model ready. ({time.time() - t0:.3f}s)')
+    t0 = time.time()
     # Set Dataloader
     vid_path, vid_writer = None, None
     if webcam:
@@ -54,7 +56,7 @@ def detect_aicook(opt):
     else:
         dataset = LoadImages(source, img_size=imgsz, stride=stride)
 
-    print(f'Model ready. ({time.time() - t0:.3f}s)')
+    print(f'Data loaded. ({time.time() - t0:.3f}s)')
 
     # Run inference
     if device.type != 'cpu':
@@ -116,7 +118,7 @@ def detect_aicook(opt):
                         if opt.save_crop:
                             save_one_box(xyxy, im0s, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
 
-                if opt.top_conf > 0:
+                if int(opt.top_conf) > 0:
                     txt_path2 = txt_path.replace('labels','top_conf')
                     labl_conf = det[det[:,4].argsort()][::-1][:,4:6]  #sorted descending by confidence
                     for cf in labl_conf[::] :
@@ -189,7 +191,7 @@ if __name__ == '__main__':
     with torch.no_grad():
         if opt.update:  # update all models (to fix SourceChangeWarning)
             for opt.weights in ['yolov5s.pt', 'yolov5m.pt', 'yolov5l.pt', 'yolov5x.pt']:
-                detect(opt=opt)
+                detect_aicook(opt=opt)
                 strip_optimizer(opt.weights)
         else:
-            detect(opt=opt)
+            detect_aicook(opt=opt)
